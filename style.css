@@ -1,3 +1,6 @@
+body {background-color: #92a8d1;}
+
+
 body,
 select {
   font: 10pt sans;
@@ -8,6 +11,7 @@ select {
   height: 600px;
   border: 1px solid red;
 }
+
 table.legend_table {
   font-size: 11px;
   border-width: 1px;

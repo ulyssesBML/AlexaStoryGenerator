@@ -1,3 +1,5 @@
+var id_count = 1;
+var id_count_edge = 1;
 var nodes = null;
 var edges = null;
 var network = null;
@@ -42,16 +44,15 @@ function draw() {
       addNode: function(data, callback) {
         // filling in the popup DOM elements
         document.getElementById("operation").innerHTML = "Add Node";
-        document.getElementById("node-id").value = data.id;
+        document.getElementById("node-id").value = id_count;
         document.getElementById("node-label").value = data.label;
-        document.getElementById("saveButton").onclick = saveData.bind(
-          this,
-          data,
-          callback
-          );
+        document.getElementById("saveButton").onclick = () => {
+          saveData(data,callback);
+          id_count = id_count + 1;
+          dataset_node.add(data);
+        }
           document.getElementById("cancelButton").onclick = clearPopUp.bind();
           document.getElementById("network-popUp").style.display = "block";
-          dataset_node.add(data)
       },
       deleteNode: function(data, callback) {
         callback(data)
@@ -64,11 +65,10 @@ function draw() {
         document.getElementById("operation").innerHTML = "Edit Node";
         document.getElementById("node-id").value = data.id;
         document.getElementById("node-label").value = data.label;
-        document.getElementById("saveButton").onclick = saveData.bind(
-          this,
-          data,
-          callback
-          );
+        document.getElementById("saveButton").onclick = () =>{ 
+          saveData(data, callback);
+          dataset_node.update(data);
+        }
           document.getElementById("cancelButton").onclick = cancelEdit.bind(
             this,
             callback
@@ -77,16 +77,20 @@ function draw() {
       },
       addEdge: function(data, callback) {
         // filling in the popup DOM elements
-        document.getElementById("operation").innerHTML = "Edit Node";
+        document.getElementById("operation").innerHTML = "Add Node";
         document.getElementById("node-label").value = data.label;
+        document.getElementById("node-id").value = id_count_edge;
+        
         data.arrows = "to";
         
         document.getElementById("saveButton").onclick = () => {
+          console.log(data)
           data.id = document.getElementById("node-id").value;
           data.label = document.getElementById("node-label").value;
           clearPopUp();
           callback(data);
           dataset_edge.add(data)
+          id_count_edge = id_count_edge + 1;
         }
 
         document.getElementById("cancelButton").onclick = cancelEdit.bind(
@@ -99,6 +103,7 @@ function draw() {
         // filling in the popup DOM elements
         document.getElementById("operation").innerHTML = "Edit Node";
         document.getElementById("node-label").value = data.label;
+        document.getElementById("node-id").value = data.id;
         data.arrows = "to";
         
         document.getElementById("saveButton").onclick = () => {
@@ -108,6 +113,7 @@ function draw() {
           callback(data);
           dataset_edge.update(data)
         }
+
 
         document.getElementById("cancelButton").onclick = cancelEdit.bind(
           this,
@@ -143,9 +149,6 @@ function saveData(data, callback) {
   data.label = document.getElementById("node-label").value;
   clearPopUp();
   callback(data);
-  dataset_node.update(data)
-
-
 }
 
 function init() {
