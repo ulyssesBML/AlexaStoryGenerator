@@ -184,21 +184,23 @@ function downloadContent(name, content) {
 
 function generate_csv(){
   var textFile = null
-  my_str = "id;text;conections\n";
+  my_str = "";
   dt_nodes = dataset_node.get(); 
   dt_edge = dataset_edge.get();
-  for(n in dt_nodes){
-    my_str = my_str + dt_nodes[n].id.toString() +";"+ dt_nodes[n].label.toString()+";[";
-    for(e in dt_edge){
-      if(dt_edge[e].from == dt_nodes[n].id){
-        my_str = my_str + "(" + dt_edge[e].to +","+ dt_edge[e].label + ")"
-      }
-    }
-    my_str = my_str + "]\n";
-  }
-  console.log(my_str)
   
-  downloadContent("story.csv",my_str)
+  my_str = JSON.stringify({'nodes':dt_nodes,'edges':dt_edge});
+  
+  console.log(my_str)
+
+  fetch("https://mog4tqj6u5.execute-api.sa-east-1.amazonaws.com/default/AlexaStroy",
+  {
+    method: "POST",
+    body: my_str
+  })
+  .then(response => {
+    console.log(response)
+  })
+  
 }
 
 
