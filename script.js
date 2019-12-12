@@ -9,7 +9,8 @@ var network = null;
 //console.log(data)
 
 var seed = 2;
-var dataset_node, dataset_edge;
+var dataset_node = new vis.DataSet();
+var dataset_edge = new vis.DataSet();
 
 function setDefaultLocale() {
   var defaultLocal = navigator.language;
@@ -49,15 +50,15 @@ function draw() {
         document.getElementById("saveButton").onclick = () => {
           saveData(data,callback);
           id_count = id_count + 1;
-          dataset_node.add(data);
+          //dataset_node.add(data);
         }
           document.getElementById("cancelButton").onclick = clearPopUp.bind();
           document.getElementById("network-popUp").style.display = "block";
       },
       deleteNode: function(data, callback) {
         callback(data)
-        dataset_node.remove(data.nodes)
-        dataset_node.remove(data.edges)
+        //dataset_node.remove(data.nodes)
+        //dataset_node.remove(data.edges)
         
       },
       editNode: function(data, callback) {
@@ -67,7 +68,7 @@ function draw() {
         document.getElementById("node-label").value = data.label;
         document.getElementById("saveButton").onclick = () =>{ 
           saveData(data, callback);
-          dataset_node.update(data);
+          //dataset_node.update(data);
         }
           document.getElementById("cancelButton").onclick = cancelEdit.bind(
             this,
@@ -89,7 +90,7 @@ function draw() {
           data.label = document.getElementById("node-label").value;
           clearPopUp();
           callback(data);
-          dataset_edge.add(data)
+          //dataset_edge.add(data)
           id_count_edge = id_count_edge + 1;
         }
 
@@ -111,7 +112,7 @@ function draw() {
           data.label = document.getElementById("node-label").value;
           clearPopUp();
           callback(data);
-          dataset_edge.update(data)
+          //dataset_edge.update(data)
         }
 
 
@@ -123,14 +124,15 @@ function draw() {
       },
       deleteEdge: function(data,callback){
         callback(data)
-        dataset_edge.remove(data.edges)
+        //dataset_edge.remove(data.edges)
       }
     }
   };
- 
-  dataset_node = new vis.DataSet(options);
-  dataset_edge = new vis.DataSet(options);
-  network = new vis.Network(container, dataset_node, options);
+  all_data_set = {
+    nodes: dataset_node,
+    edges:dataset_edge
+  }
+  network = new vis.Network(container, all_data_set, options);
 }
 
 function clearPopUp() {
@@ -182,29 +184,73 @@ function downloadContent(name, content) {
   atag.click();
 }
 
-function generate_csv(){
+function save_story(){
   var textFile = null
-  my_str = "";
-  dt_nodes = dataset_node.get(); 
-  dt_edge = dataset_edge.get();
+  dt_nodes = dataset_node.get().map(x => {
+    return {'id':x.id,'label':x.label}
+  }); 
+  dt_edge = dataset_edge.get().map(x => {
+    return{'to':x.to, 'from':x.from,'label':x.label, 'arrows':x.arrows}
+  });
   
-  my_str = JSON.stringify({'nodes':dt_nodes,'edges':dt_edge});
+  name = document.getElementById("name").value
   
-  console.log(my_str)
-
-  fetch("https://mog4tqj6u5.execute-api.sa-east-1.amazonaws.com/default/AlexaStroy",
-  {
-    method: "POST",
-    body: my_str
-  })
-  .then(response => {
-    console.log(response)
-  })
-  
+  if(name === ""){
+    alert("Coloque um nome na historia.");
+  }
+  else if(dt_nodes === []){
+    alert("Não há nos nesse grafo.");
+  }
+  else if(dt_edge === []){
+    alert("Não há arestas nesse grafo");
+  }
+  else{
+    axios.post("https://mog4tqj6u5.execute-api.sa-east-1.amazonaws.com/default/AlexaStroy", {
+      'name': name,
+      'story':{'nodes':dt_nodes,'edges':dt_edge}
+    })
+    .then(function (response) {
+      alert("Salvo")
+      console.log(response.data);
+    })
+    .catch(function (error) {
+      alert("Erro ao salvar: "+error)
+      console.log(error);
+    });
+  }
 }
+
+function importNetwork() {
+  axios.get("https://mog4tqj6u5.execute-api.sa-east-1.amazonaws.com/default/AlexaStroy/2")
+  .then(response => {
+    dataset_node = new vis.DataSet(response.data.Item.story.nodes)
+    dataset_edge = new vis.DataSet(response.data.Item.story.edges)
+    
+    let aux_num = dataset_node.getIds(); 
+    for(i in aux_num){
+      if(parseInt(aux_num[i],10) > id_count){
+        id_count = parseInt(aux_num[i],10);
+      }      
+    }
+    id_count = id_count +1;
+
+
+    aux_num = dataset_edge.getIds(); 
+    for(i in aux_num){
+      if(parseInt(aux_num[i],10) > id_count_edge){
+        id_count_edge = parseInt(aux_num[i],10);
+      }      
+    }
+    id_count_edge = id_count_edge +1;
+
+    draw()
+  })
+}
+
 
 
 
 window.addEventListener("load", () => {
   init();
 });
+

@@ -1,6 +1,7 @@
 
 <html>
 <head>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <script type="text/javascript" src="script.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css">
@@ -8,8 +9,8 @@
     <style type="text/css">
         #mynetwork {
             background-color: #e5e5ff;
-            width: 2000px;
-            height: 1400px;
+            width: 1700px;
+            height: 700px;
             border: 1px solid lightgray;
         }
     </style>
@@ -17,11 +18,13 @@
 <body>
 
 <h2>Criador de Historia Alexa</h2>
-<button id="csv_generate" onclick="generate_csv()" type="button">Gerar CSV</button>
+<button id="save_story" onclick="save_story()" type="button">Salvar Historia</button>
+<button id="importNetwork" onclick="importNetwork()" type="button">Carrega Historia</button>
+
 <a download="info.txt" id="downloadlink" style="display: none">Download</a>
 
 <p>
-  <label for="locale">Select a locale:</label>
+  <label for="locale">Selecione um idioma::</label>
   <select id="locale" onchange="draw();">
     <option value="en">en</option>
     <option value="cn">cn</option>
@@ -37,13 +40,22 @@
   </select>
 </p>
 
+<p>
+  <label>Selecione uma historia:</label>
+  <select id="select_story" onchange="">
+  </select>
+</p>
+<label>Nome nova historia</label>
+<input type="text" name="fname" id="name"><br>
+
+
 <div id="network-popUp">
   <span id="operation">node</span> <br />
   <table style="margin:auto;">
     <tbody>
       <tr>
         <td>id</td>
-        <td><input id="node-id" value="new value" /></td>
+        <td><input id="node-id"  type="number" value="new value" /></td>
       </tr>
       <tr>
         <td>label</td>
