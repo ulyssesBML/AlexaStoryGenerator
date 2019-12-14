@@ -39,7 +39,35 @@ function draw() {
   // create a network
   var container = document.getElementById("mynetwork");
   var options = {
-    layout: { randomSeed: seed }, // just to make sure the layout is the same when the locale is changed
+    /*layout: {
+      hierarchical: {
+        direction: 'UD',
+        levelSeparation: 120,
+        nodeSpacing: 1000,
+        blockShifting: false,
+        edgeMinimization: false,
+        sortMethod: 'hubsize',
+        shakeTowards:'roots',
+      }
+    },*/
+    layout:{
+      randomSeed:3
+    },
+    physics: {
+      enabled:true,
+      barnesHut: {
+        gravitationalConstant: -49260,
+        centralGravity: 9.8,
+        springConstant: 0,
+        damping: 1.0,
+        avoidOverlap: 1
+      },
+      maxVelocity: 150,
+      minVelocity: 0.75,
+      timestep: 0.1,
+      solver: 'barnesHut'
+    },
+    //physics: false,
     locale: document.getElementById("locale").value,
     manipulation: {
       addNode: function(data, callback) {
