@@ -39,26 +39,43 @@ function draw() {
   // create a network
   var container = document.getElementById("mynetwork");
   var options = {
-    /*layout: {
-      hierarchical: {
-        direction: 'UD',
-        levelSeparation: 120,
-        nodeSpacing: 1000,
-        blockShifting: false,
-        edgeMinimization: false,
-        sortMethod: 'hubsize',
-        shakeTowards:'roots',
+    nodes: {
+      shape: "box",
+      margin: 10,
+      widthConstraint: {
+        maximum: 200
       }
-    },*/
+    },
+    edges: {
+      smooth: true,
+      arrows: { to: true }
+    },
+    //layout:{
+    //  hierarchical: {
+    //    direction: "UD",
+    //    nodeSpacing: 500,
+    //  }
+    //},
+    //physics: {
+    //  hierarchicalRepulsion: {
+    //    avoidOverlap: 1,
+    //    centralGravity: 0,
+    //    springLength: 50,
+    //    nodeDistance: 500
+    //  },
+    //  minVelocity: 0.75,
+    //  solver: "hierarchicalRepulsion"
+//
+    //},
     layout:{
-      randomSeed:3
+      randomSeed:5
     },
     physics: {
       enabled:true,
       barnesHut: {
-        gravitationalConstant: -49260,
-        centralGravity: 9.8,
-        springConstant: 0,
+        gravitationalConstant: -10000,
+        centralGravity: 0,
+        springConstant: 0.0,
         damping: 1.0,
         avoidOverlap: 1
       },
@@ -251,6 +268,17 @@ function save_story(){
 function importNetwork() {
   axios.get("https://mog4tqj6u5.execute-api.sa-east-1.amazonaws.com/default/AlexaStroy/2")
   .then(response => {
+    response.data.Item.story.nodes.map(x => {
+      if (x.id == 0){
+        x['color'] = 'lime'
+        //x['level'] = 0
+      }
+      else{
+        //x['level'] = calc_level(parseInt(x['id']))
+      }
+
+      return x;
+    })
     dataset_node = new vis.DataSet(response.data.Item.story.nodes)
     dataset_edge = new vis.DataSet(response.data.Item.story.edges)
     
@@ -274,8 +302,6 @@ function importNetwork() {
     draw()
   })
 }
-
-
 
 
 window.addEventListener("load", () => {
